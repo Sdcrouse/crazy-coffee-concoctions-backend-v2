@@ -1,0 +1,24 @@
+{
+  "name": "crazy-coffee-concoctions-backend-v2",
+  "version": "1.0.0",
+  "description": "An updated version of the Crazy Coffee Concoctions project that uses a Node.js backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sdcrouse/crazy-coffee-concoctions-backend-v2.git"
+  },
+  "author": "Steven Crouse",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Sdcrouse/crazy-coffee-concoctions-backend-v2/issues"
+  },
+  "homepage": "https://github.com/Sdcrouse/crazy-coffee-concoctions-backend-v2#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
