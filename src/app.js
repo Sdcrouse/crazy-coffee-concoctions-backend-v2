@@ -8,8 +8,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
 
-// TODO: Make this asynchronous and use the Promise-based version of bcrypt
-app.post('/users', (req, res) => {
+app.post('/users', async (req, res) => {
     const { username, password } = req.body;
     const user = getUser(username);
 
@@ -19,12 +18,13 @@ app.post('/users', (req, res) => {
     }
 
     const saltRounds = parseInt(process.env.SALT_ROUNDS);
-    const hashedPassword = bcrypt.hashSync(password, saltRounds);
     
     try {
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
         addUser(username, hashedPassword);
         res.sendStatus(201);
     } catch (error) {
+        console.error(error);
         res.status(500).json('Something went wrong. Please try again later.');
     }
 });
