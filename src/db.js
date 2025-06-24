@@ -10,6 +10,6 @@ export function getUser(username) {
 }
 
 export function addUser(username, password) {
-    const id = users.length;
+    const id = users.length + 1;
     users.push({ id, username, password });
 }
