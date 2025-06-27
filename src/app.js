@@ -9,10 +9,11 @@ const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
 
-app.post(
-    '/users',
-    body('username').trim().notEmpty().withMessage('Username is required.'),
-    body('password').trim().notEmpty().withMessage('Password is required.'),
+const userValidations = () => body('username').trim().notEmpty().withMessage('Username is required.');
+
+const passwordValidations = () => body('password').trim().notEmpty().withMessage('Password is required.');
+
+app.post('/users', userValidations(), passwordValidations(),
     async (req, res) => {
         const result = validationResult(req);
         
