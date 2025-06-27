@@ -5,7 +5,7 @@ const users = [
     { id: 4, username: 'user4', password: 'password4' },
 ];
 
-export function getUser(username) {
+export function findUserByUsername(username) {
     return users.find(user => user.username === username);
 }
 

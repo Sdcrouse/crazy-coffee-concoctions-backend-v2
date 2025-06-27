@@ -2,7 +2,7 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import { body, matchedData, validationResult } from 'express-validator';
 
-import { getUser, addUser } from './db.js';
+import { findUserByUsername, addUser } from './db.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -32,7 +32,7 @@ app.post(
         }
 
         const { username, password } = matchedData(req);
-        const user = getUser(username);
+        const user = findUserByUsername(username);
 
         if (user) {
             res.status(409).json('A user with this username already exists!');
