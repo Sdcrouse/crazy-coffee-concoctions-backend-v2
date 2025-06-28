@@ -1,5 +1,6 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
+import cors from 'cors';
 import { body, matchedData, validationResult } from 'express-validator';
 
 import { findUserByUsername, addUser } from './db.js';
@@ -7,7 +8,9 @@ import { findUserByUsername, addUser } from './db.js';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Middlewares
 app.use(express.json());
+app.use(cors({ origin: 'http://127.0.0.1:5500' }));
 
 const userValidations = () => body('username')
     .trim().notEmpty().withMessage('Username is required.').bail()
@@ -26,6 +29,7 @@ const passwordValidations = () => body('password')
 app.post('/users', userValidations(), passwordValidations(),
     async (req, res) => {
         const result = validationResult(req);
+        let status;
         
         if (!result.isEmpty()) {
             let errorMessages = {};
@@ -38,7 +42,8 @@ app.post('/users', userValidations(), passwordValidations(),
                 }
             }
 
-            res.status(400).json({ errors: errorMessages });
+            status = 400;
+            res.status(status).json({ status, errors: errorMessages });
             return;
         }
 
@@ -46,7 +51,8 @@ app.post('/users', userValidations(), passwordValidations(),
         const user = findUserByUsername(username);
 
         if (user) {
-            res.status(409).json('A user with this username already exists!');
+            status = 409;
+            res.status(status).json({ status, errorMessage: 'A user with this username already exists!' });
             return;
         }
 
@@ -55,10 +61,13 @@ app.post('/users', userValidations(), passwordValidations(),
         try {
             const hashedPassword = await bcrypt.hash(password, saltRounds);
             addUser(username, hashedPassword);
-            res.sendStatus(201);
+
+            status = 201;
+            res.status(status).json({ status, successMessage: 'You have successfully signed up! Please login to your account.' });
         } catch (error) {
             console.error(error);
-            res.status(500).json('Something went wrong. Please try again later.');
+            status = 500;
+            res.status(status).json({ status, errorMessage: 'Something went wrong. Please try again later.' });
         }
     }
 );
