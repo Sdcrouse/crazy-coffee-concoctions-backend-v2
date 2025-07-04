@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import cors from 'cors';
 import { body, matchedData, validationResult } from 'express-validator';
 
-import { findUserByUsername, addUser } from './db.js';
+import { findUserByUsername, createUser } from './db.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -48,7 +48,7 @@ app.post('/users', userValidations(), passwordValidations(),
         }
 
         const { username, password } = matchedData(req);
-        const user = findUserByUsername(username);
+        const user = await findUserByUsername(username);
 
         if (user) {
             status = 409;
@@ -60,7 +60,7 @@ app.post('/users', userValidations(), passwordValidations(),
         
         try {
             const hashedPassword = await bcrypt.hash(password, saltRounds);
-            addUser(username, hashedPassword);
+            await createUser(username, hashedPassword);
 
             status = 201;
             res.status(status).json({ status, successMessage: 'You have successfully signed up! Please login to your account.' });

@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// TODO: See if I can move this into a separate file as middleware
+// I will need this for other tables
 const pool = mysql.createPool({
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
@@ -10,26 +12,18 @@ const pool = mysql.createPool({
     database: process.env.MYSQL_DB
 }).promise();
 
-// async function getUsers() {
-//     const [rows] = await pool.query("SELECT * FROM users");
-//     return rows;
-// }
+export async function findUserByUsername(username) {
+    const [usersByUsername] = await pool.query(`
+        SELECT * FROM users
+        WHERE username = ?
+    `, [username]);
 
-// const users = await getUsers();
-// console.log(users);
-
-const users = [
-    { id: 1, username: 'user1', password: 'password1' },
-    { id: 2, username: 'user2', password: 'password2' },
-    { id: 3, username: 'user3', password: 'password3' },
-    { id: 4, username: 'user4', password: 'password4' },
-];
-
-export function findUserByUsername(username) {
-    return users.find(user => user.username === username);
+    return usersByUsername[0];
 }
 
-export function addUser(username, password) {
-    const id = users.length + 1;
-    users.push({ id, username, password });
+export async function createUser(username, password) {
+    await pool.query(`
+        INSERT INTO users (username, password)
+        VALUES (?, ?)
+    `, [username.toLowerCase(), password]);
 }
