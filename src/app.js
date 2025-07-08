@@ -1,6 +1,8 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import cors from 'cors';
+import jwt from 'jsonwebtoken';
+
 import { body, matchedData, validationResult } from 'express-validator';
 
 import { findUserByUsername, createUser } from './db.js';
@@ -26,6 +28,7 @@ const passwordValidations = () => body('password')
     .custom((passValue, { req }) => !passValue.includes(req.body.username) && !passValue.toLowerCase().includes('password'))
         .withMessage("Password must not contain the username or the word 'password'.");
 
+// TODO: Rename this to '/register' for naming consistency
 app.post('/users', userValidations(), passwordValidations(),
     async (req, res) => {
         const result = validationResult(req);
@@ -71,6 +74,42 @@ app.post('/users', userValidations(), passwordValidations(),
         }
     }
 );
+
+app.post('/login', async (req, res) => {
+    const {username, password} = req.body;
+    let status;
+
+    try {
+        const user = await findUserByUsername(username);
+
+        if (!user) {
+            status = 404;
+            res.status(status).json({ status, errorMessage: 'User not found' });
+            return;
+        }
+
+        const passwordIsCorrect = await bcrypt.compare(password, user.password);
+
+        if (!passwordIsCorrect) {
+            status = 401;
+            res.status(status).json({ status, errorMessage: 'Incorrect password' });
+            return;
+        }
+
+        const token = jwt.sign(
+            { id: user.id },
+            process.env.JWT_SECRET,
+            { expiresIn: '12h' }
+        );
+        status = 200;
+
+        res.status(status).json({ status, token, successMessage: `Welcome, ${username}! You are logged in.` });
+    } catch (error) {
+        console.error(error);
+        status = 500;
+        res.status(status).json({ status, errorMessage: 'Something went wrong. Please try again later.' });
+    }
+});
 
 app.listen(PORT, () => {
     console.log(`Server has started on port ${PORT}`);
