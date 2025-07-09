@@ -29,6 +29,7 @@ const passwordValidations = () => body('password')
         .withMessage("Password must not contain the username or the word 'password'.");
 
 // TODO: Rename this to '/register' for naming consistency
+// TODO: Remove the .bail() for the "strong password" validation in order to return multiple password errors
 app.post('/users', userValidations(), passwordValidations(),
     async (req, res) => {
         const result = validationResult(req);
@@ -76,12 +77,20 @@ app.post('/users', userValidations(), passwordValidations(),
 );
 
 app.post('/login', async (req, res) => {
-    const {username, password} = req.body;
     let status;
+    let errors = {};
 
-    if (!username.trim() || !password.trim()) {
+    let {username, password} = req.body;
+    username = username.trim();
+    password = password.trim();
+
+    if (!username || !password) {
         status = 401;
-        res.status(status).json({ status, errorMessage: 'Username and/or password is missing' });
+
+        if (!username) errors.username = 'Username is missing';
+        if (!password) errors.password = 'Password is missing';
+
+        res.status(status).json({ status, errors });
         return;
     }
 
@@ -89,15 +98,16 @@ app.post('/login', async (req, res) => {
         const user = await findUserByUsername(username);
         if (!user) {
             status = 404;
-            res.status(status).json({ status, errorMessage: 'User not found' });
+            errors.username = 'User not found';
+            res.status(status).json({ status, errors });
             return;
         }
 
         const passwordIsCorrect = await bcrypt.compare(password, user.password);
-
         if (!passwordIsCorrect) {
             status = 401;
-            res.status(status).json({ status, errorMessage: 'Incorrect password' });
+            errors.password = 'Incorrect password';
+            res.status(status).json({ status, errors });
             return;
         }
 
@@ -106,8 +116,8 @@ app.post('/login', async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: '12h' }
         );
-        status = 200;
 
+        status = 200;
         res.status(status).json({ status, token, successMessage: `Welcome, ${username}! You are logged in.` });
     } catch (error) {
         console.error(error);
