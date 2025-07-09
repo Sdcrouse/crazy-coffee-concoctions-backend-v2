@@ -79,9 +79,14 @@ app.post('/login', async (req, res) => {
     const {username, password} = req.body;
     let status;
 
+    if (!username.trim() || !password.trim()) {
+        status = 401;
+        res.status(status).json({ status, errorMessage: 'Username and/or password is missing' });
+        return;
+    }
+
     try {
         const user = await findUserByUsername(username);
-
         if (!user) {
             status = 404;
             res.status(status).json({ status, errorMessage: 'User not found' });
