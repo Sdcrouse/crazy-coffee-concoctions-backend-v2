@@ -28,7 +28,7 @@ const passwordValidations = () => body('password')
     .custom((passValue, { req }) => !passValue.includes(req.body.username) && !passValue.toLowerCase().includes('password'))
         .withMessage("Password must not contain the username or the word 'password'.");
 
-// TODO: Rename this to '/register' for naming consistency
+// TODO: Rename this to '/signup' for naming consistency
 // TODO: Remove the .bail() for the "strong password" validation in order to return multiple password errors
 app.post('/users', userValidations(), passwordValidations(),
     async (req, res) => {
@@ -114,17 +114,29 @@ app.post('/login', async (req, res) => {
         const token = jwt.sign(
             { id: user.id },
             process.env.JWT_SECRET,
-            { expiresIn: '12h' }
+            { expiresIn: '2h' }
         );
+        const options = {
+            maxAge: 2 * 60 * 60 * 1000, // Expires in 2 hours
+            httpOnly: true,
+            secure: true,
+            sameSite: "None" 
+        };
+        res.cookie('SessionID', token, options);
+        console.log(res);
 
         status = 200;
-        res.status(status).json({ status, token, successMessage: `Welcome, ${username}! You are logged in.` });
+        res.status(status).json({ status, successMessage: `Welcome, ${username}! You are logged in.` });
     } catch (error) {
         console.error(error);
         status = 500;
         res.status(status).json({ status, errorMessage: 'Something went wrong. Please try again later.' });
     }
 });
+
+// Next step: Middleware and/or logout route
+// It's possible that I'll need to expire the token and save it to a blacklist (requiring another MySQL table)
+// For faster login, see if using jwt asynchronously will help (i.e. the jwt.sign part)
 
 app.listen(PORT, () => {
     console.log(`Server has started on port ${PORT}`);
