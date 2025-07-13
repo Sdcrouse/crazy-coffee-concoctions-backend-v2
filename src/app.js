@@ -24,13 +24,11 @@ const passwordValidations = () => body('password')
     .trim().notEmpty().withMessage('Password is required.').bail()
     .isStrongPassword().withMessage(
         'Password is not strong enough. It must be at least 8 characters long and contain one of each of the following: lowercase letters, uppercase letters, numbers, and special characters.'
-    ).bail()
+    )
     .custom((passValue, { req }) => !passValue.includes(req.body.username) && !passValue.toLowerCase().includes('password'))
         .withMessage("Password must not contain the username or the word 'password'.");
 
-// TODO: Rename this to '/signup' for naming consistency
-// TODO: Remove the .bail() for the "strong password" validation in order to return multiple password errors
-app.post('/users', userValidations(), passwordValidations(),
+app.post('/signup', userValidations(), passwordValidations(),
     async (req, res) => {
         const result = validationResult(req);
         let status;
