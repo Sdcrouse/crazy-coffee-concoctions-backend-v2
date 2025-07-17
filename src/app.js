@@ -1,6 +1,7 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
 
 import { body, matchedData, validationResult } from 'express-validator';
@@ -12,7 +13,8 @@ const PORT = process.env.PORT || 5000;
 
 // Middlewares
 app.use(express.json());
-app.use(cors({ origin: 'http://127.0.0.1:5500' }));
+app.use(cors({ origin: 'http://127.0.0.1:5500', credentials: true }));
+app.use(cookieParser());
 
 const userValidations = () => body('username')
     .trim().notEmpty().withMessage('Username is required.').bail()
@@ -112,16 +114,16 @@ app.post('/login', async (req, res) => {
         const token = jwt.sign(
             { id: user.id },
             process.env.JWT_SECRET,
-            { expiresIn: '2h' }
+            { expiresIn: '30m' }
         );
         const options = {
-            maxAge: 2 * 60 * 60 * 1000, // Expires in 2 hours
+            maxAge: 30 * 60 * 1000, // Expires in 30m
             httpOnly: true,
             secure: true,
-            sameSite: "None" 
+            sameSite: 'None',
+            partitioned: true
         };
-        res.cookie('SessionID', token, options);
-        console.log(res);
+        res.cookie('sessionId', token, options);
 
         status = 200;
         res.status(status).json({ status, successMessage: `Welcome, ${username}! You are logged in.` });
@@ -132,7 +134,14 @@ app.post('/login', async (req, res) => {
     }
 });
 
-// Next step: Middleware and/or logout route
+// TODO: Move this route into a separate file for concoction-related routes
+// TODO: Get concoctions by userID
+app.get('/concoctions', async (req, res) => {
+    res.status(200).json({ status: 200, message: "Here are your concoctions!" });
+});
+
+
+// Next step: Logout route
 // It's possible that I'll need to expire the token and save it to a blacklist (requiring another MySQL table)
 // For faster login, see if using jwt asynchronously will help (i.e. the jwt.sign part)
 
