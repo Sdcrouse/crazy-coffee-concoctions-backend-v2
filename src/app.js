@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken';
 
 import { body, matchedData, validationResult } from 'express-validator';
 
+import authMiddleware from './middleware/authMiddleware.js';
 import { findUserByUsername, createUser } from './db.js';
 
 const app = express();
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use(cors({ origin: 'http://127.0.0.1:5500', credentials: true }));
 app.use(cookieParser());
 
+// Validations
 const userValidations = () => body('username')
     .trim().notEmpty().withMessage('Username is required.').bail()
     .isLength({ min: 8 }).withMessage('Username must be at least eight characters long.')
@@ -136,10 +138,10 @@ app.post('/login', async (req, res) => {
 
 // TODO: Move this route into a separate file for concoction-related routes
 // TODO: Get concoctions by userID
-app.get('/concoctions', async (req, res) => {
+app.get('/concoctions', authMiddleware, async (req, res) => {
+    console.log(req.userId);
     res.status(200).json({ status: 200, message: "Here are your concoctions!" });
 });
-
 
 // Next step: Logout route
 // It's possible that I'll need to expire the token and save it to a blacklist (requiring another MySQL table)
