@@ -4,11 +4,10 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
 
-import { body, matchedData, validationResult } from 'express-validator';
-
 import authMiddleware from './middleware/authMiddleware.js';
+import userRoutes from './routes/userRoutes.js';
 import concoctionRoutes from './routes/concoctionRoutes.js';
-import { findUserByUsername, createUser } from './db.js';
+import { findUserByUsername } from './db.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -20,67 +19,7 @@ app.use(cookieParser());
 
 // Routes
 app.use('/concoctions', authMiddleware, concoctionRoutes);
-
-// Validations
-const userValidations = () => body('username')
-    .trim().notEmpty().withMessage('Username is required.').bail()
-    .isLength({ min: 8 }).withMessage('Username must be at least eight characters long.')
-    .matches(/^[\w\.]+$/).withMessage('Username should only contain letters, numbers, periods, and underscores.')
-    .matches(/^[a-zA-Z].*[a-zA-Z\d]$/).withMessage('Username must start with a letter and end with a letter or number.');
-
-const passwordValidations = () => body('password')
-    .trim().notEmpty().withMessage('Password is required.').bail()
-    .isStrongPassword().withMessage(
-        'Password is not strong enough. It must be at least 8 characters long and contain one of each of the following: lowercase letters, uppercase letters, numbers, and special characters.'
-    )
-    .custom((passValue, { req }) => !passValue.includes(req.body.username) && !passValue.toLowerCase().includes('password'))
-        .withMessage("Password must not contain the username or the word 'password'.");
-
-app.post('/signup', userValidations(), passwordValidations(),
-    async (req, res) => {
-        const result = validationResult(req);
-        let status;
-        
-        if (!result.isEmpty()) {
-            let errorMessages = {};
-    
-            for (const error of result.errors) {
-                if (error.path in errorMessages) {
-                    errorMessages[error.path].push(error.msg);
-                } else {
-                    errorMessages[error.path] = [error.msg];
-                }
-            }
-
-            status = 400;
-            res.status(status).json({ status, errors: errorMessages });
-            return;
-        }
-
-        const { username, password } = matchedData(req);
-        const user = await findUserByUsername(username);
-
-        if (user) {
-            status = 409;
-            res.status(status).json({ status, errorMessage: 'A user with this username already exists!' });
-            return;
-        }
-
-        const saltRounds = parseInt(process.env.SALT_ROUNDS);
-        
-        try {
-            const hashedPassword = await bcrypt.hash(password, saltRounds);
-            await createUser(username, hashedPassword);
-
-            status = 201;
-            res.status(status).json({ status, successMessage: 'You have successfully signed up! Please login to your account.' });
-        } catch (error) {
-            console.error(error);
-            status = 500;
-            res.status(status).json({ status, errorMessage: 'Something went wrong. Please try again later.' });
-        }
-    }
-);
+app.use('/users', userRoutes);
 
 app.post('/login', async (req, res) => {
     let status;
@@ -139,10 +78,6 @@ app.post('/login', async (req, res) => {
         res.status(status).json({ status, errorMessage: 'Something went wrong. Please try again later.' });
     }
 });
-
-// Next step: Logout route
-// It's possible that I'll need to expire the token and save it to a blacklist (requiring another MySQL table)
-// For faster login, see if using jwt asynchronously will help (i.e. the jwt.sign part)
 
 app.listen(PORT, () => {
     console.log(`Server has started on port ${PORT}`);
