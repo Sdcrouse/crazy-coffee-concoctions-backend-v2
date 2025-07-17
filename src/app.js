@@ -7,6 +7,7 @@ import jwt from 'jsonwebtoken';
 import { body, matchedData, validationResult } from 'express-validator';
 
 import authMiddleware from './middleware/authMiddleware.js';
+import concoctionRoutes from './routes/concoctionRoutes.js';
 import { findUserByUsername, createUser } from './db.js';
 
 const app = express();
@@ -16,6 +17,9 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(cors({ origin: 'http://127.0.0.1:5500', credentials: true }));
 app.use(cookieParser());
+
+// Routes
+app.use('/concoctions', authMiddleware, concoctionRoutes);
 
 // Validations
 const userValidations = () => body('username')
@@ -134,13 +138,6 @@ app.post('/login', async (req, res) => {
         status = 500;
         res.status(status).json({ status, errorMessage: 'Something went wrong. Please try again later.' });
     }
-});
-
-// TODO: Move this route into a separate file for concoction-related routes
-// TODO: Get concoctions by userID
-app.get('/concoctions', authMiddleware, async (req, res) => {
-    console.log(req.userId);
-    res.status(200).json({ status: 200, message: "Here are your concoctions!" });
 });
 
 // Next step: Logout route
