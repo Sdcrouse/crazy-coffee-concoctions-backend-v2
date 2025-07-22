@@ -6,8 +6,8 @@ async function authMiddleware(req, res, next) {
     try {
         const sessionCookie = req.cookies.sessionId;
         if (!sessionCookie) {
-            status = 401;
-            return res.status(status).json({ status, message: 'No session ID provided' });
+            status = 400;
+            return res.status(status).json({ status, message: 'No session ID provided. Please log in.' });
         }
     
         jwt.verify(sessionCookie, process.env.JWT_SECRET, async (err, decoded) => {

@@ -48,6 +48,7 @@ async function signup(req, res) {
     }
 }
 
+// TODO: Add a refresh token
 async function login(req, res) {
     let status;
     let errors = {};
@@ -57,7 +58,7 @@ async function login(req, res) {
     password = password.trim();
 
     if (!username || !password) {
-        status = 401;
+        status = 400;
 
         if (!username) errors.username = 'Username is missing';
         if (!password) errors.password = 'Password is missing';
