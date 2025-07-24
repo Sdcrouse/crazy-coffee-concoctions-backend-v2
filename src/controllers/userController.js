@@ -48,7 +48,6 @@ async function signup(req, res) {
     }
 }
 
-// TODO: Add a refresh token
 async function login(req, res) {
     let status;
     let errors = {};
@@ -84,19 +83,33 @@ async function login(req, res) {
             return;
         }
 
-        const token = jwt.sign(
+        const accessToken = jwt.sign(
             { id: user.id },
             process.env.JWT_SECRET,
-            { expiresIn: '30m' }
+            { expiresIn: '15m' }
         );
-        const options = {
-            maxAge: 30 * 60 * 1000, // Expires in 30m
+        const accessOptions = {
+            maxAge: 15 * 60 * 1000, // Expires in 15m
             httpOnly: true,
             secure: true,
             sameSite: 'None',
             partitioned: true
         };
-        res.cookie('sessionId', token, options);
+        res.cookie('sessionId', accessToken, accessOptions);
+
+        const refreshToken = jwt.sign(
+            { id: user.id },
+            process.env.REFRESH_SECRET,
+            { expiresIn: '7d' }
+        );
+        const refreshOptions = {
+            maxAge: 7 * 24 * 60 * 60 * 1000, // Expires in 7 days
+            httpOnly: true,
+            secure: true,
+            sameSite: 'None',
+            partitioned: true
+        };
+        res.cookie('refreshToken', refreshToken, refreshOptions);
 
         status = 200;
         res.status(status).json({ status, successMessage: `Welcome, ${username}! You are logged in.` });
@@ -107,4 +120,32 @@ async function login(req, res) {
     }
 }
 
-export { signup, login };
+async function refresh(req, res) {
+    let status;
+
+    try {
+        const accessToken = jwt.sign(
+            { id: req.userId },
+            process.env.JWT_SECRET,
+            { expiresIn: '15m' }
+        );
+
+        const accessOptions = {
+            maxAge: 15 * 60 * 1000, // Expires in 15m
+            httpOnly: true,
+            secure: true,
+            sameSite: 'None',
+            partitioned: true
+        };
+
+        res.cookie('sessionId', accessToken, accessOptions);
+        status = 200;
+        res.status(status).json({ status });
+    } catch (error) {
+        console.error(error);
+        status = 500;
+        res.status(status).json({ status, errorMessage: 'Something went wrong while refreshing your session. Please try again later.' });
+    }
+}
+
+export { signup, login, refresh };
