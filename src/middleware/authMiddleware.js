@@ -7,13 +7,13 @@ async function authMiddleware(req, res, next) {
         const sessionCookie = req.cookies.sessionId;
         if (!sessionCookie) {
             status = 400;
-            return res.status(status).json({ status, message: 'No session ID provided. Please log in.' });
+            return res.status(status).json({ status });
         }
     
         jwt.verify(sessionCookie, process.env.JWT_SECRET, async (err, decoded) => {
             if (err) {
                 status = 401;
-                return res.status(status).json({ status, message: 'Either this session has expired, or an invalid session ID was provided. Please log in.' });
+                return res.status(status).json({ status });
             }
 
             req.userId = decoded.id;
@@ -33,13 +33,13 @@ async function verifyRefreshToken(req, res, next) {
         const refreshToken = req.cookies.refreshToken;
         if (!refreshToken) {
             status = 400;
-            return res.status(status).json({ status, message: 'No refresh token provided. Please log in.' });
+            return res.status(status).json({ status, errorMessage: 'No refresh token provided. Please log in.' });
         }
 
         jwt.verify(refreshToken, process.env.REFRESH_SECRET, async (err, decoded) => {
             if (err) {
                 status = 401;
-                return res.status(status).json({ status, message: 'Either this refresh token has expired, or an invalid token was provided. Please log in.' });
+                return res.status(status).json({ status, errorMessage: 'Either this refresh token has expired, or an invalid token was provided. Please log in.' });
             }
 
             req.userId = decoded.id;
