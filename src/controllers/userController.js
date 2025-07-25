@@ -83,11 +83,12 @@ async function login(req, res) {
             return;
         }
 
-        const {accessToken, accessOptions} = createAccessTokenAndOptions(user.id);
+        const userId = user.id;
+        const {accessToken, accessOptions} = createAccessTokenAndOptions(userId);
         res.cookie('sessionId', accessToken, accessOptions);
 
         const refreshToken = jwt.sign(
-            { id: user.id },
+            { id: userId, version: user.ref_token_version },
             process.env.REFRESH_SECRET,
             { expiresIn: '7d' }
         );
