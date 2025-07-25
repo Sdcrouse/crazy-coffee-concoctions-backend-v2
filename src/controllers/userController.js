@@ -83,18 +83,7 @@ async function login(req, res) {
             return;
         }
 
-        const accessToken = jwt.sign(
-            { id: user.id },
-            process.env.JWT_SECRET,
-            { expiresIn: '15m' }
-        );
-        const accessOptions = {
-            maxAge: 15 * 60 * 1000, // Expires in 15m
-            httpOnly: true,
-            secure: true,
-            sameSite: 'None',
-            partitioned: true
-        };
+        const {accessToken, accessOptions} = createAccessTokenAndOptions(user.id);
         res.cookie('sessionId', accessToken, accessOptions);
 
         const refreshToken = jwt.sign(
@@ -124,20 +113,7 @@ async function refresh(req, res) {
     let status;
 
     try {
-        const accessToken = jwt.sign(
-            { id: req.userId },
-            process.env.JWT_SECRET,
-            { expiresIn: '15m' }
-        );
-
-        const accessOptions = {
-            maxAge: 15 * 60 * 1000, // Expires in 15m
-            httpOnly: true,
-            secure: true,
-            sameSite: 'None',
-            partitioned: true
-        };
-
+        const {accessToken, accessOptions} = createAccessTokenAndOptions(req.userId);
         res.cookie('sessionId', accessToken, accessOptions);
         status = 200;
         res.status(status).json({ status });
@@ -146,6 +122,24 @@ async function refresh(req, res) {
         status = 500;
         res.status(status).json({ status, errorMessage: 'Something went wrong while refreshing your session. Please try again later.' });
     }
+}
+
+function createAccessTokenAndOptions(id) {
+    const accessToken = jwt.sign(
+        { id },
+        process.env.JWT_SECRET,
+        { expiresIn: '15m' }
+    );
+
+    const accessOptions = {
+        maxAge: 15 * 60 * 1000, // Expires in 15m
+        httpOnly: true,
+        secure: true,
+        sameSite: 'None',
+        partitioned: true
+    };
+
+    return { accessToken, accessOptions };
 }
 
 export { signup, login, refresh };
