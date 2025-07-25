@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
-import authMiddleware from './middleware/authMiddleware.js';
+import { verifySession } from './middleware/authMiddleware.js';
 import userRoutes from './routes/userRoutes.js';
 import concoctionRoutes from './routes/concoctionRoutes.js';
 
@@ -15,7 +15,7 @@ app.use(cors({ origin: 'http://127.0.0.1:5500', credentials: true }));
 app.use(cookieParser());
 
 // Routes
-app.use('/concoctions', authMiddleware, concoctionRoutes);
+app.use('/concoctions', verifySession, concoctionRoutes);
 app.use('/users', userRoutes);
 
 app.listen(PORT, () => {

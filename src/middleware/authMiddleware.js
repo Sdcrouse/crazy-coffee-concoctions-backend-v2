@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-async function authMiddleware(req, res, next) {
+async function verifySession(req, res, next) {
     let status;
 
     try {
@@ -52,5 +52,4 @@ async function verifyRefreshToken(req, res, next) {
     }
 }
 
-export { verifyRefreshToken };
-export default authMiddleware;
+export { verifySession, verifyRefreshToken };
