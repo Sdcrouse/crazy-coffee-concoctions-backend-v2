@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 import { matchedData, validationResult } from 'express-validator';
-import { findUserByUsername, createUser } from '../db.js';
+import { findUserByUsername, createUser, increaseTokenVersion } from '../db.js';
 
 async function signup(req, res) {
     const result = validationResult(req);
@@ -125,6 +125,34 @@ async function refresh(req, res) {
     }
 }
 
+// TODO: Move common tokenOptions into a separate constant
+async function logout(req, res) {
+    const {userId, version} = req;
+    let status;
+
+    try {
+        await increaseTokenVersion(userId, version);
+
+        const tokenOptions = {
+            maxAge: 0,
+            httpOnly: true,
+            secure: true,
+            sameSite: 'None',
+            partitioned: true
+        };
+
+        res.cookie('sessionId', '', tokenOptions);
+        res.cookie('refreshToken', '', tokenOptions);
+
+        status = 200;
+        res.status(status).json({ status, logoutSuccessMessage: 'You have successfully logged out!' });
+    } catch (error) {
+        console.error(error);
+        status = 500;
+        res.status(status).json({ status, errorMessage: 'Something went wrong while logging you out. Please try again later.' });
+    }
+}
+
 function createAccessTokenAndOptions(id) {
     const accessToken = jwt.sign(
         { id },
@@ -143,4 +171,4 @@ function createAccessTokenAndOptions(id) {
     return { accessToken, accessOptions };
 }
 
-export { signup, login, refresh };
+export { signup, login, refresh, logout };

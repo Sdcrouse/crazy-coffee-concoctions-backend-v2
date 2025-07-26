@@ -43,6 +43,7 @@ async function verifyRefreshToken(req, res, next) {
             }
 
             req.userId = decoded.id;
+            req.version = decoded.version;
             next();
         });
     } catch (error) {
