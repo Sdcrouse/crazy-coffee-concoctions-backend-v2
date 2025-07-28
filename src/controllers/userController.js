@@ -4,6 +4,13 @@ import jwt from 'jsonwebtoken';
 import { matchedData, validationResult } from 'express-validator';
 import { findUserByUsername, createUser, increaseTokenVersion } from '../db.js';
 
+const defaultTokenOptions = {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'None',
+    partitioned: true
+};
+
 async function signup(req, res) {
     const result = validationResult(req);
     let status;
@@ -93,11 +100,8 @@ async function login(req, res) {
             { expiresIn: '7d' }
         );
         const refreshOptions = {
-            maxAge: 7 * 24 * 60 * 60 * 1000, // Expires in 7 days
-            httpOnly: true,
-            secure: true,
-            sameSite: 'None',
-            partitioned: true
+            ...defaultTokenOptions,
+            maxAge: 7 * 24 * 60 * 60 * 1000 // Expires in 7 days
         };
         res.cookie('refreshToken', refreshToken, refreshOptions);
 
@@ -125,7 +129,6 @@ async function refresh(req, res) {
     }
 }
 
-// TODO: Move common tokenOptions into a separate constant
 async function logout(req, res) {
     const {userId, version} = req;
     let status;
@@ -134,11 +137,8 @@ async function logout(req, res) {
         await increaseTokenVersion(userId, version);
 
         const tokenOptions = {
-            maxAge: 0,
-            httpOnly: true,
-            secure: true,
-            sameSite: 'None',
-            partitioned: true
+            ...defaultTokenOptions,
+            maxAge: 0
         };
 
         res.cookie('sessionId', '', tokenOptions);
@@ -161,11 +161,8 @@ function createAccessTokenAndOptions(id) {
     );
 
     const accessOptions = {
-        maxAge: 15 * 60 * 1000, // Expires in 15m
-        httpOnly: true,
-        secure: true,
-        sameSite: 'None',
-        partitioned: true
+        ...defaultTokenOptions,
+        maxAge: 15 * 60 * 1000 // Expires in 15m
     };
 
     return { accessToken, accessOptions };
