@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 import { matchedData, validationResult } from 'express-validator';
-import { findUserByUsername, createUser, increaseTokenVersion } from '../db.js';
+import { findUserByUsername, createUser, increaseTokenVersion } from '../databases/db.js';
 
 const defaultTokenOptions = {
     httpOnly: true,
