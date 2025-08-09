@@ -1,10 +1,8 @@
 import pool from "./dbConfig.js";
 
 async function findConcoctionsByUserId(userId) {
-    // Note: This converts the created_at value from UTC to PST
-    
     const [concsByUserId] = await pool.query(`
-        SELECT id, name, CONVERT_TZ(created_at, '+00:00','-08:00') AS created
+        SELECT id, name, created_at AS created
         FROM concoctions
         WHERE user_id = ?
         ORDER BY created DESC
