@@ -37,9 +37,9 @@ async function getConcoction(req, res) {
             return;
         }
 
-        const { name, instructions, notes } = userConcoction;
+        const { instructions, notes } = userConcoction;
         status = 200;
-        res.status(status).json({ status, concoction: { name, instructions, notes } });
+        res.status(status).json({ status, concoction: { instructions, notes } });
     } catch (error) {
         console.error(error);
         status = 500;

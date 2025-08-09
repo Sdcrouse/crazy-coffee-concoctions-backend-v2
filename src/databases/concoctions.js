@@ -13,7 +13,7 @@ async function findConcoctionsByUserId(userId) {
 
 async function findConcoctionById(id) {
     const [concoctionsById] = await pool.query(`
-        SELECT name, instructions, notes, user_id as userId
+        SELECT instructions, notes, user_id as userId
         FROM concoctions
         WHERE id = ?
     `, [id]);
