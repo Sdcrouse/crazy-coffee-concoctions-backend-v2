@@ -1,3 +1,4 @@
+import findCoffeeByConcoctionId from "../databases/coffees.js";
 import { findConcoctionsByUserId, findConcoctionById } from "../databases/concoctions.js";
 
 async function getConcoctions(req, res) {
@@ -23,7 +24,8 @@ async function getConcoction(req, res) {
     let status;
 
     try {
-        const userConcoction = await findConcoctionById(req.params.id);
+        const { id } = req.params;
+        const userConcoction = await findConcoctionById(id);
 
         if (!userConcoction) {
             status = 404;
@@ -38,8 +40,12 @@ async function getConcoction(req, res) {
         }
 
         const { instructions, notes } = userConcoction;
+        
+        const coffee = await findCoffeeByConcoctionId(id);
+        if (!coffee) throw new Error('Unable to find any coffee for this concoction.'); // Edge case
+
         status = 200;
-        res.status(status).json({ status, concoction: { instructions, notes } });
+        res.status(status).json({ status, concoction: { instructions, notes }, coffee });
     } catch (error) {
         console.error(error);
         status = 500;
