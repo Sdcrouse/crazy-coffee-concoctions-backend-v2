@@ -57,3 +57,33 @@ VALUES (
     'Perfect for a hot summer day!',
     1
 );
+
+
+-- Coffees:
+
+INSERT INTO coffees (amount, brand, blend, roast, concoction_id)
+VALUES ('2 tsp', 'Starbucks', 'Veranda Blend', 'Blonde', 1);
+
+INSERT INTO coffees (amount, brand, blend, concoction_id)
+VALUES ('1 1/2 tsp', 'Folgers', 'Instant Coffee', 2);
+
+INSERT INTO coffees (amount, brand, blend, roast, concoction_id)
+VALUES ('1 tbsp', 'Starbucks', 'Fall Blend', 'Medium', 3);
+
+INSERT INTO coffees (amount, brand, blend, roast, concoction_id)
+VALUES ('1.5 tsp', 'Cafe Bustelo', 'Espresso Ground Coffee', 'Dark', 4);
+
+INSERT INTO coffees (amount, brand, bean_type, blend, roast, concoction_id)
+VALUES ('1 1/4 tbsp', 'Big Island Coffee Roasters', '100% Kona Coffee', 'Kona Red Bourbon', 'Medium-Light', 5);
+
+INSERT INTO coffees (amount, brand, blend, concoction_id)
+VALUES('1 teaspoon', 'Yuban', 'Premium Instant Blend', 6);
+
+INSERT INTO coffees (amount, brand, blend, roast, concoction_id)
+VALUES('1 1/2 tsp', 'Nescafe', 'Clasico Instant Coffee', 'Dark', 7);
+
+INSERT INTO coffees (amount, brand, bean_type, blend, concoction_id)
+VALUES('2 tsp', 'Yuban', 'Arabica', 'Instant', 8);
+
+INSERT INTO coffees (amount, brand, bean_type, blend, roast, concoction_id)
+VALUES('1 tbsp', 'Saigondan', 'Robusta', 'Adventure', 'Light Espresso', 9);
