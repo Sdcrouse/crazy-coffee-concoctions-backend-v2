@@ -18,7 +18,7 @@ VALUES (
 );
 INSERT INTO concoctions (`name`, instructions, notes, user_id)
 VALUES (
-    'Pumpkin Spice Latte',
+    'Pumpkin Spice Coffee',
     'Mix together the hot water, sugar, and pumpkin spice. Then add the creamer and stir. Serve hot.',
     'It is easier to mix in the pumpkin spice BEFORE the creamer instead of AFTER.',
     5
@@ -53,8 +53,15 @@ VALUES (
 INSERT INTO concoctions (`name`, instructions, notes, user_id)
 VALUES (
     'Iced Latte',
-    'Mix together the instant coffee, cold water, sweetener, and creamer. Then carefully add the ice cube to avoid a big splash. Wait about a minute for the coffee to get cold. Enjoy!',
+    'Mix together the instant coffee, cold water, sweeteners, and creamers. Then carefully add the ice cube to avoid a big splash. Add cold milk and stir carefully. Wait about a minute for the coffee to get cold. Enjoy!',
     'Perfect for a hot summer day!',
+    1
+);
+
+INSERT INTO concoctions (`name`, instructions, user_id)
+VALUES (
+    'Instant Black Coffee',
+    'Mix black coffee and hot water. Serve immediately.',
     1
 );
 
@@ -87,3 +94,71 @@ VALUES('2 tsp', 'Yuban', 'Arabica', 'Instant', 8);
 
 INSERT INTO coffees (amount, brand, bean_type, blend, roast, concoction_id)
 VALUES('1 tbsp', 'Saigondan', 'Robusta', 'Adventure', 'Light Espresso', 9);
+
+
+-- Ingredients
+
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('1 1/2 cups', 'hot milk', 'Liquid', 1);
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('1 tsp', 'Ghirardelli Cocoa Powder', 'Other', 1);
+
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('2 cups', 'hot water', 'Liquid', 2);
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('1 packet', "Sweet'N Low", 'Sweetener', 2);
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('2 tsp', 'International Delight French Vanilla', 'Creamer', 2);
+
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('2 cups', 'hot water', 'Liquid', 3);
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('1 cube', 'sugar', 'Sweetener', 3);
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('1 tsp', 'Coffee mate Original', 'Creamer', 3);
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('A pinch', 'pumpkin spice', 'Other', 3);
+
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('1.75 cups', 'boiling water', 'Liquid', 4);
+
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('1 cup', 'hot milk', 'Liquid', 5);
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('1 1/4 tsp', 'cocoa powder', 'Other', 5);
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('3/4 tsp', 'sugar', 'Sweetener', 5);
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('A pinch', 'cinnamon', 'Other', 5);
+
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('1/3 cup', 'hot water', 'Liquid', 6);
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('1/3 cup', 'steamed milk', 'Liquid', 6);
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('1/3 cup', 'foamed milk', 'Other', 6);
+
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('2 cups', 'boiling water', 'Liquid', 7);
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('1 packet', 'sugar', 'Sweetener', 7);
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('1 1/2 tsp', 'dark chocolate', 'Creamer', 7);
+
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('1 1/2 cups', 'cold water', 'Liquid', 8);
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('A packet', 'Splenda', 'Sweetener', 8);
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('1/8 tsp', 'sugar', 'Sweetener', 8);
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('1 1/3 tsp', 'hazelnut-flavored', 'Creamer', 8);
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('3/4 tsp', 'French vanilla-flavored', 'Creamer', 8);
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('1', 'ice cube', 'Other', 8);
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('1/2 cup', 'milk', 'Liquid', 8);
+
+INSERT INTO ingredients (amount, `name`, category, concoction_id)
+VALUES ('2 1/4 cups', 'hot water', 'Liquid', 9);

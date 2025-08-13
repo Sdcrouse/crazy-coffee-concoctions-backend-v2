@@ -33,3 +33,12 @@ CREATE TABLE coffees (
     roast VARCHAR(20),
     FOREIGN KEY (concoction_id) REFERENCES concoctions(id)
 );
+
+CREATE TABLE ingredients (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    concoction_id INTEGER NOT NULL,
+    amount VARCHAR(50) NOT NULL,
+    `name` VARCHAR(50) NOT NULL,
+    category VARCHAR(10) NOT NULL,
+    FOREIGN KEY (concoction_id) REFERENCES concoctions(id)
+);
