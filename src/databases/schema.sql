@@ -39,6 +39,6 @@ CREATE TABLE ingredients (
     concoction_id INTEGER NOT NULL,
     amount VARCHAR(50) NOT NULL,
     `name` VARCHAR(50) NOT NULL,
-    category VARCHAR(10) NOT NULL,
+    category VARCHAR(30) NOT NULL,
     FOREIGN KEY (concoction_id) REFERENCES concoctions(id)
 );
