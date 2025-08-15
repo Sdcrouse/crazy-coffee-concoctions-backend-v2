@@ -30,7 +30,7 @@ CREATE TABLE coffees (
     brand VARCHAR(50) NOT NULL,
     bean_type VARCHAR(30),
     blend VARCHAR(75) NOT NULL,
-    roast VARCHAR(20),
+    roast VARCHAR(15),
     FOREIGN KEY (concoction_id) REFERENCES concoctions(id)
 );
 

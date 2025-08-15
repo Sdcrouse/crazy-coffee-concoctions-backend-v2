@@ -93,7 +93,7 @@ INSERT INTO coffees (amount, brand, bean_type, blend, concoction_id)
 VALUES('2 tsp', 'Yuban', 'Arabica', 'Instant', 8);
 
 INSERT INTO coffees (amount, brand, bean_type, blend, roast, concoction_id)
-VALUES('1 tbsp', 'Saigondan', 'Robusta', 'Adventure', 'Light Espresso', 9);
+VALUES('1 tbsp', 'Saigondan', 'Robusta', 'Adventure', 'Light', 9);
 
 
 -- Ingredients
