@@ -57,4 +57,24 @@ async function getConcoction(req, res) {
     }
 }
 
-export { getConcoctions, getConcoction };
+async function createNewConcoction(req, res) {
+    const { name, instructions, notes } = req.body.concoction;
+    const { coffee, ingredients } = req.body;
+    let status;
+
+    // TODO: Add validations for blank required values (HTTP 400) and same-named concoctions belonging to a specific user (HTTP 409)
+    // TODO: Save the concoction, coffee, and ingredients to the database
+
+    try {
+        status = 201;
+        res.status(status).json({
+            status, successMessage: 'Concoction successfully created!', concoction: { name, instructions, notes }, coffee, ingredients
+        });
+    } catch (error) {
+        console.error(error);
+        status = 500;
+        res.status(status).json({ status, errorMessage: "There was an error while creating this concoction. Please try again later." });
+    }
+}
+
+export { getConcoctions, getConcoction, createNewConcoction };
