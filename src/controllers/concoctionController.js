@@ -66,6 +66,16 @@ async function createNewConcoction(req, res) {
     // TODO: Save the concoction, coffee, and ingredients to the database
 
     try {
+        const userConcoctions = await findConcoctionsByUserId(req.userId);
+
+        for (const userConcoction of userConcoctions) {
+            if (userConcoction.name === name) {
+                status = 409;
+                res.status(status).json({ status, errorMessage: 'You already have a concoction with this name. Please enter a different name.' });
+                return;
+            }
+        }
+
         status = 201;
         res.status(status).json({
             status, successMessage: 'Concoction successfully created!', concoction: { name, instructions, notes }, coffee, ingredients
