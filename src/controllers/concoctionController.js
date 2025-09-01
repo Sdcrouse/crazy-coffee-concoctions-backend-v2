@@ -58,14 +58,32 @@ async function getConcoction(req, res) {
 }
 
 async function createNewConcoction(req, res) {
-    const { name, instructions, notes } = req.body.concoction;
-    const { coffee, ingredients } = req.body;
+    const { concoction, coffee, ingredients } = req.body;
+    const { name, instructions } = concoction;
+    const { amount, brand, blend } = coffee;
     let status;
 
-    // TODO: Add validations for blank required values (HTTP 400) and same-named concoctions belonging to a specific user (HTTP 409)
     // TODO: Save the concoction, coffee, and ingredients to the database
 
     try {
+        let errors = [];
+
+        if (isBlank(name) || isBlank(instructions)) errors.push('The concoction is missing a name and/or instructions.');
+        if (isBlank(amount) || isBlank(brand) || isBlank(blend)) errors.push('The coffee is missing an amount, brand, and/or blend.');
+
+        for (const ingredient of ingredients) {
+            if (isBlank(ingredient.category) || isBlank(ingredient.amount) || isBlank(ingredient.name)) {
+                errors.push('At least one ingredient is missing a category, amount, and/or name.');
+                break;
+            }
+        }
+
+        if (errors.length > 0) {            
+            status = 400;
+            res.status(status).json({ status, errorMessage: 'Some required values are missing. Please try again.', errors });
+            return;
+        }
+
         const userConcoctions = await findConcoctionsByUserId(req.userId);
 
         for (const userConcoction of userConcoctions) {
@@ -77,14 +95,16 @@ async function createNewConcoction(req, res) {
         }
 
         status = 201;
-        res.status(status).json({
-            status, successMessage: 'Concoction successfully created!', concoction: { name, instructions, notes }, coffee, ingredients
-        });
+        res.status(status).json({ status, successMessage: 'Concoction successfully created!', concoction, coffee, ingredients });
     } catch (error) {
         console.error(error);
         status = 500;
         res.status(status).json({ status, errorMessage: "There was an error while creating this concoction. Please try again later." });
     }
+}
+
+function isBlank(value) {
+    return value === undefined || value === null || value.trim().length === 0;
 }
 
 export { getConcoctions, getConcoction, createNewConcoction };
