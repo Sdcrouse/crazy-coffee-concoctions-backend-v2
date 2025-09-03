@@ -21,4 +21,13 @@ async function findConcoctionById(id) {
     return concoctionsById[0];
 }
 
-export { findConcoctionsByUserId, findConcoctionById };
+async function createConcoction(userId, name, instructions, notes) {
+    await pool.query(`
+        INSERT INTO concoctions (user_id, name, instructions, notes)
+        VALUES (?, ?, ?, ?)
+    `, [userId, name, instructions, notes]);
+
+    return await pool.query('SELECT LAST_INSERT_ID()');
+}
+
+export { findConcoctionsByUserId, findConcoctionById, createConcoction };

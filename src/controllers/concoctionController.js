@@ -1,6 +1,6 @@
-import findCoffeeByConcoctionId from "../databases/coffees.js";
-import findIngredientsByConcoctionId from "../databases/ingredients.js";
-import { findConcoctionsByUserId, findConcoctionById } from "../databases/concoctions.js";
+import { findCoffeeByConcoctionId, createCoffee } from "../databases/coffees.js";
+import { findIngredientsByConcoctionId, createIngredient } from "../databases/ingredients.js";
+import { findConcoctionsByUserId, findConcoctionById, createConcoction } from "../databases/concoctions.js";
 
 async function getConcoctions(req, res) {
     let status;
@@ -59,11 +59,9 @@ async function getConcoction(req, res) {
 
 async function createNewConcoction(req, res) {
     const { concoction, coffee, ingredients } = req.body;
-    const { name, instructions } = concoction;
-    const { amount, brand, blend } = coffee;
+    const { name, instructions, notes } = concoction;
+    const { amount, brand, blend, roast, beanType } = coffee;
     let status;
-
-    // TODO: Save the concoction, coffee, and ingredients to the database
 
     try {
         let errors = [];
@@ -93,6 +91,19 @@ async function createNewConcoction(req, res) {
                 return;
             }
         }
+
+        let concoctionArgs = [req.userId, name, instructions];
+        if (notes) concoctionArgs.push(notes);
+
+        const concoctionIdData = await createConcoction(...concoctionArgs);
+        const concoctionId = concoctionIdData[0][0]['LAST_INSERT_ID()'];
+
+        let optionalCoffeeArgs = {};
+        if (roast) optionalCoffeeArgs.roast = roast;
+        if (beanType) optionalCoffeeArgs.beanType = beanType;
+        await createCoffee(concoctionId, amount, brand, blend, optionalCoffeeArgs);
+
+        for (const ingredient of ingredients) await createIngredient(concoctionId, ingredient.category, ingredient.amount, ingredient.name);
 
         status = 201;
         res.status(status).json({ status, successMessage: 'Concoction successfully created!', concoction, coffee, ingredients });

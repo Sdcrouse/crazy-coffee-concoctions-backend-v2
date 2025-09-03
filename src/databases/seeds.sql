@@ -57,7 +57,6 @@ VALUES (
     'Perfect for a hot summer day!',
     1
 );
-
 INSERT INTO concoctions (`name`, instructions, user_id)
 VALUES (
     'Instant Black Coffee',

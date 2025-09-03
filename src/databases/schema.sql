@@ -2,8 +2,10 @@ DROP DATABASE IF EXISTS crazy_coffee_concoctions;
 CREATE DATABASE crazy_coffee_concoctions;
 USE crazy_coffee_concoctions;
 
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS ingredients;
+DROP TABLE IF EXISTS coffees;
 DROP TABLE IF EXISTS concoctions;
+DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
 	id INTEGER NOT NULL AUTO_INCREMENT,
