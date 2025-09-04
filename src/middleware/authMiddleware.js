@@ -1,15 +1,16 @@
 import jwt from 'jsonwebtoken';
+import { handleServerError } from '../utils/errorStatuses.js';
 
 async function verifySession(req, res, next) {
     let status;
 
+    const sessionCookie = req.cookies.sessionId;
+    if (!sessionCookie) {
+        status = 400;
+        return res.status(status).json({ status });
+    }
+
     try {
-        const sessionCookie = req.cookies.sessionId;
-        if (!sessionCookie) {
-            status = 400;
-            return res.status(status).json({ status });
-        }
-    
         jwt.verify(sessionCookie, process.env.JWT_SECRET, async (err, decoded) => {
             if (err) {
                 status = 401;
@@ -20,22 +21,20 @@ async function verifySession(req, res, next) {
             next();
         });
     } catch (error) {
-        console.error(error);
-        status = 500;
-        res.status(status).json({ status, errorMessage: 'Something went wrong while verifying the session. Please try again later.' });
+        handleServerError(error, 'Something went wrong while verifying the session. Please try again later.', res);
     }
 }
 
 async function verifyRefreshToken(req, res, next) {
     let status;
 
-    try {
-        const refreshToken = req.cookies.refreshToken;
-        if (!refreshToken) {
-            status = 400;
-            return res.status(status).json({ status, errorMessage: 'No refresh token provided. Please log in.' });
-        }
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+        status = 400;
+        return res.status(status).json({ status, errorMessage: 'No refresh token provided. Please log in.' });
+    }
 
+    try {
         jwt.verify(refreshToken, process.env.REFRESH_SECRET, async (err, decoded) => {
             if (err) {
                 status = 401;
@@ -47,9 +46,7 @@ async function verifyRefreshToken(req, res, next) {
             next();
         });
     } catch (error) {
-        console.error(error);
-        status = 500;
-        res.status(status).json({ status, errorMessage: 'Something went wrong while verifying the refresh token. Please try again later.' });
+        handleServerError(error, 'Something went wrong while verifying the refresh token. Please try again later.', res);
     }
 }
 

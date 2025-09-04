@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 
 import { matchedData, validationResult } from 'express-validator';
 import { findUserByUsername, createUser, increaseTokenVersion } from '../databases/users.js';
-import { handleServerError } from './controllerUtils.js';
+import { handleServerError } from '../utils/errorStatuses.js';
 
 const defaultTokenOptions = {
     httpOnly: true,
