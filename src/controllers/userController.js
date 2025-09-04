@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 
 import { matchedData, validationResult } from 'express-validator';
 import { findUserByUsername, createUser, increaseTokenVersion } from '../databases/users.js';
+import { handleServerError } from './controllerUtils.js';
 
 const defaultTokenOptions = {
     httpOnly: true,
@@ -49,9 +50,7 @@ async function signup(req, res) {
         status = 201;
         res.status(status).json({ status, successMessage: 'You have successfully signed up! Please login to your account.' });
     } catch (error) {
-        console.error(error);
-        status = 500;
-        res.status(status).json({ status, errorMessage: 'Something went wrong. Please try again later.' });
+        handleServerError(error, 'Something went wrong while signing you up. Please try again later.', res);
     }
 }
 
@@ -108,9 +107,7 @@ async function login(req, res) {
         status = 200;
         res.status(status).json({ status, successMessage: `Welcome, ${username}! You are logged in.` });
     } catch (error) {
-        console.error(error);
-        status = 500;
-        res.status(status).json({ status, errorMessage: 'Something went wrong. Please try again later.' });
+        handleServerError(error, 'Something went wrong while logging you in. Please try again later.', res);
     }
 }
 
@@ -123,9 +120,7 @@ async function refresh(req, res) {
         status = 200;
         res.status(status).json({ status });
     } catch (error) {
-        console.error(error);
-        status = 500;
-        res.status(status).json({ status, errorMessage: 'Something went wrong while refreshing your session. Please try again later.' });
+        handleServerError(error, 'Something went wrong while refreshing your session. Please try again later.', res);
     }
 }
 
@@ -147,9 +142,7 @@ async function logout(req, res) {
         status = 200;
         res.status(status).json({ status, logoutSuccessMessage: 'You have successfully logged out!' });
     } catch (error) {
-        console.error(error);
-        status = 500;
-        res.status(status).json({ status, errorMessage: 'Something went wrong while logging you out. Please try again later.' });
+        handleServerError(error, 'Something went wrong while logging you out. Please try again later.', res);
     }
 }
 

@@ -1,6 +1,7 @@
 import { findCoffeeByConcoctionId, createCoffee } from "../databases/coffees.js";
 import { findIngredientsByConcoctionId, createIngredient } from "../databases/ingredients.js";
 import { findConcoctionsByUserId, findConcoctionById, createConcoction } from "../databases/concoctions.js";
+import { handleServerError } from "./controllerUtils.js";
 
 async function getConcoctions(req, res) {
     let status;
@@ -15,9 +16,7 @@ async function getConcoctions(req, res) {
             res.status(status).json({ status, concoctions: userConcoctions });
         }
     } catch (error) {
-        console.error(error);
-        status = 500;
-        res.status(status).json({ status, message: "There was an error while fetching your concoctions. Please try again later." });
+        handleServerError(error, "There was an error while fetching your concoctions. Please try again later.", res);
     }
 }
 
@@ -51,9 +50,7 @@ async function getConcoction(req, res) {
         status = 200;
         res.status(status).json({ status, concoction: { instructions, notes }, coffee, ingredients });
     } catch (error) {
-        console.error(error);
-        status = 500;
-        res.status(status).json({ status, errorMessage: "There was an error while searching for this concoction. Please try again later." });
+        handleServerError(error, "There was an error while searching for this concoction. Please try again later.", res);
     }
 }
 
@@ -108,9 +105,7 @@ async function createNewConcoction(req, res) {
         status = 201;
         res.status(status).json({ status, successMessage: 'Concoction successfully created!', concoction, coffee, ingredients });
     } catch (error) {
-        console.error(error);
-        status = 500;
-        res.status(status).json({ status, errorMessage: "There was an error while creating this concoction. Please try again later." });
+        handleServerError(error, "There was an error while creating this concoction. Please try again later.", res);
     }
 }
 
