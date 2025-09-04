@@ -57,10 +57,8 @@ async function signup(req, res) {
 async function login(req, res) {
     let status;
     let errors = {};
-
-    let {username, password} = req.body;
-    username = username.trim();
-    password = password.trim();
+    const username = req.body.username.trim();
+    const password = req.body.password.trim();
 
     if (!username || !password) {
         status = 400;
@@ -112,12 +110,11 @@ async function login(req, res) {
 }
 
 async function refresh(req, res) {
-    let status;
-
     try {
         const {accessToken, accessOptions} = createAccessTokenAndOptions(req.userId);
         res.cookie('sessionId', accessToken, accessOptions);
-        status = 200;
+        
+        const status = 200;
         res.status(status).json({ status });
     } catch (error) {
         handleServerError(error, 'Something went wrong while refreshing your session. Please try again later.', res);
@@ -125,11 +122,8 @@ async function refresh(req, res) {
 }
 
 async function logout(req, res) {
-    const {userId, version} = req;
-    let status;
-
     try {
-        await increaseTokenVersion(userId, version);
+        await increaseTokenVersion(req.userId, req.version);
 
         const tokenOptions = {
             ...defaultTokenOptions,
@@ -139,7 +133,7 @@ async function logout(req, res) {
         res.cookie('sessionId', '', tokenOptions);
         res.cookie('refreshToken', '', tokenOptions);
 
-        status = 200;
+        const status = 200;
         res.status(status).json({ status, logoutSuccessMessage: 'You have successfully logged out!' });
     } catch (error) {
         handleServerError(error, 'Something went wrong while logging you out. Please try again later.', res);

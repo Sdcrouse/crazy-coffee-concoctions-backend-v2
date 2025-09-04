@@ -4,11 +4,10 @@ import { findConcoctionsByUserId, findConcoctionById, createConcoction } from ".
 import { handleServerError } from "./controllerUtils.js";
 
 async function getConcoctions(req, res) {
-    let status;
+    const status = 200;
 
     try {
         const userConcoctions = await findConcoctionsByUserId(req.userId);
-        status = 200;
 
         if (userConcoctions.length === 0) {
             res.status(status).json({ status, noConcoctionsMessage: "You don't have any concoctions! Click 'New Concoction' to create one." });
@@ -21,12 +20,11 @@ async function getConcoctions(req, res) {
 }
 
 async function getConcoction(req, res) {
+    const { id } = req.params;
     let status;
 
     try {
-        const { id } = req.params;
         const userConcoction = await findConcoctionById(id);
-
         if (!userConcoction) {
             status = 404;
             res.status(status).json({ status, errorMessage: 'This concoction does not exist.' });
@@ -58,27 +56,25 @@ async function createNewConcoction(req, res) {
     const { concoction, coffee, ingredients } = req.body;
     const { name, instructions, notes } = concoction;
     const { amount, brand, blend, roast, beanType } = coffee;
-    let status;
+    let status, errors = [];
+
+    if (isBlank(name) || isBlank(instructions)) errors.push('The concoction is missing a name and/or instructions.');
+    if (isBlank(amount) || isBlank(brand) || isBlank(blend)) errors.push('The coffee is missing an amount, brand, and/or blend.');
+    
+    for (const ingredient of ingredients) {
+        if (isBlank(ingredient.category) || isBlank(ingredient.amount) || isBlank(ingredient.name)) {
+            errors.push('At least one ingredient is missing a category, amount, and/or name.');
+            break;
+        }
+    }
+    
+    if (errors.length > 0) {
+        status = 400;
+        res.status(status).json({ status, errorMessage: 'Some required values are missing. Please try again.', errors });
+        return;
+    }
 
     try {
-        let errors = [];
-
-        if (isBlank(name) || isBlank(instructions)) errors.push('The concoction is missing a name and/or instructions.');
-        if (isBlank(amount) || isBlank(brand) || isBlank(blend)) errors.push('The coffee is missing an amount, brand, and/or blend.');
-
-        for (const ingredient of ingredients) {
-            if (isBlank(ingredient.category) || isBlank(ingredient.amount) || isBlank(ingredient.name)) {
-                errors.push('At least one ingredient is missing a category, amount, and/or name.');
-                break;
-            }
-        }
-
-        if (errors.length > 0) {            
-            status = 400;
-            res.status(status).json({ status, errorMessage: 'Some required values are missing. Please try again.', errors });
-            return;
-        }
-
         const userConcoctions = await findConcoctionsByUserId(req.userId);
 
         for (const userConcoction of userConcoctions) {
