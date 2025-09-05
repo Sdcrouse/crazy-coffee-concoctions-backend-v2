@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { matchedData, validationResult } from 'express-validator';
 import { findUserByUsername, createUser, increaseTokenVersion } from '../databases/users.js';
 import { handleServerError, handleUserError, handleUserErrors } from '../utils/errorHandlers.js';
+import statusResponse from '../utils/statusResponse.js';
 
 const defaultTokenOptions = {
     httpOnly: true,
@@ -30,7 +31,7 @@ async function signup(req, res) {
     }
 
     const { username, password } = matchedData(req);
-    
+
     const user = await findUserByUsername(username);
     if (user) return handleUserError('A user with this username already exists!', 409, res);
 
@@ -97,9 +98,7 @@ async function refresh(req, res) {
     try {
         const {accessToken, accessOptions} = createAccessTokenAndOptions(req.userId);
         res.cookie('sessionId', accessToken, accessOptions);
-        
-        const status = 200;
-        res.status(status).json({ status });
+        return statusResponse(res, 200);
     } catch (error) {
         handleServerError(error, 'Something went wrong while refreshing your session. Please try again later.', res);
     }

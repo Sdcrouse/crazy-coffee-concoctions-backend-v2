@@ -1,22 +1,14 @@
 import jwt from 'jsonwebtoken';
 import { handleServerError, handleUserError } from '../utils/errorHandlers.js';
+import statusResponse from '../utils/statusResponse.js';
 
 async function verifySession(req, res, next) {
-    let status;
-
     const sessionCookie = req.cookies.sessionId;
-    if (!sessionCookie) {
-        status = 400;
-        return res.status(status).json({ status });
-    }
+    if (!sessionCookie) return statusResponse(res, 400);
 
     try {
         jwt.verify(sessionCookie, process.env.JWT_SECRET, async (err, decoded) => {
-            if (err) {
-                status = 401;
-                return res.status(status).json({ status });
-            }
-
+            if (err) return statusResponse(res, 401);
             req.userId = decoded.id;
             next();
         });
