@@ -1,7 +1,7 @@
 import { findCoffeeByConcoctionId, createCoffee } from "../databases/coffees.js";
 import { findIngredientsByConcoctionId, createIngredient } from "../databases/ingredients.js";
 import { findConcoctionsByUserId, findConcoctionById, createConcoction } from "../databases/concoctions.js";
-import { handleServerError } from "../utils/errorStatuses.js";
+import { handleServerError, handleUserError } from "../utils/errorStatuses.js";
 
 async function getConcoctions(req, res) {
     const status = 200;
@@ -21,19 +21,16 @@ async function getConcoctions(req, res) {
 
 async function getConcoction(req, res) {
     const { id } = req.params;
-    let status;
 
     try {
         const userConcoction = await findConcoctionById(id);
         if (!userConcoction) {
-            status = 404;
-            res.status(status).json({ status, errorMessage: 'This concoction does not exist.' });
+            handleUserError('This concoction does not exist.', 404, res);
             return;
         }
 
         if (userConcoction.userId != req.userId) {
-            status = 403;
-            res.status(status).json({ status, errorMessage: 'You are not allowed to access this concoction!' });
+            handleUserError('You are not allowed to access this concoction!', 403, res);
             return;
         }
 
@@ -45,7 +42,7 @@ async function getConcoction(req, res) {
         const ingredients = await findIngredientsByConcoctionId(id);
         if (ingredients.length === 0) throw new Error('Unable to find any ingredients for this concoction.'); // Edge case
 
-        status = 200;
+        const status = 200;
         res.status(status).json({ status, concoction: { instructions, notes }, coffee, ingredients });
     } catch (error) {
         handleServerError(error, "There was an error while searching for this concoction. Please try again later.", res);
@@ -79,8 +76,7 @@ async function createNewConcoction(req, res) {
 
         for (const userConcoction of userConcoctions) {
             if (userConcoction.name === name) {
-                status = 409;
-                res.status(status).json({ status, errorMessage: 'You already have a concoction with this name. Please enter a different name.' });
+                handleUserError('You already have a concoction with this name. Please enter a different name.', 409, res);
                 return;
             }
         }
