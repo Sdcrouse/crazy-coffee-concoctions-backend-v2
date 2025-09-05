@@ -1,7 +1,7 @@
 import { findCoffeeByConcoctionId, createCoffee } from "../databases/coffees.js";
 import { findIngredientsByConcoctionId, createIngredient } from "../databases/ingredients.js";
 import { findConcoctionsByUserId, findConcoctionById, createConcoction } from "../databases/concoctions.js";
-import { handleServerError, handleUserError } from "../utils/errorStatuses.js";
+import { handleServerError, handleUserError, handleUserErrors } from "../utils/errorStatuses.js";
 
 async function getConcoctions(req, res) {
     const status = 200;
@@ -53,7 +53,7 @@ async function createNewConcoction(req, res) {
     const { concoction, coffee, ingredients } = req.body;
     const { name, instructions, notes } = concoction;
     const { amount, brand, blend, roast, beanType } = coffee;
-    let status, errors = [];
+    let errors = [];
 
     if (isBlank(name) || isBlank(instructions)) errors.push('The concoction is missing a name and/or instructions.');
     if (isBlank(amount) || isBlank(brand) || isBlank(blend)) errors.push('The coffee is missing an amount, brand, and/or blend.');
@@ -65,11 +65,7 @@ async function createNewConcoction(req, res) {
         }
     }
     
-    if (errors.length > 0) {
-        status = 400;
-        res.status(status).json({ status, errorMessage: 'Some required values are missing. Please try again.', errors });
-        return;
-    }
+    if (errors.length > 0) return handleUserErrors(errors, 400, res, 'Some required values are missing. Please try again.');
 
     try {
         const userConcoctions = await findConcoctionsByUserId(req.userId);
@@ -94,7 +90,7 @@ async function createNewConcoction(req, res) {
 
         for (const ingredient of ingredients) await createIngredient(concoctionId, ingredient.category, ingredient.amount, ingredient.name);
 
-        status = 201;
+        const status = 201;
         res.status(status).json({ status, successMessage: 'Concoction successfully created!', concoction, coffee, ingredients });
     } catch (error) {
         handleServerError(error, "There was an error while creating this concoction. Please try again later.", res);

@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 
 import { matchedData, validationResult } from 'express-validator';
 import { findUserByUsername, createUser, increaseTokenVersion } from '../databases/users.js';
-import { handleServerError, handleUserError } from '../utils/errorStatuses.js';
+import { handleServerError, handleUserError, handleUserErrors } from '../utils/errorStatuses.js';
 
 const defaultTokenOptions = {
     httpOnly: true,
@@ -14,7 +14,6 @@ const defaultTokenOptions = {
 
 async function signup(req, res) {
     const result = validationResult(req);
-    let status;
     
     if (!result.isEmpty()) {
         let errorMessages = {};
@@ -27,9 +26,7 @@ async function signup(req, res) {
             }
         }
 
-        status = 400;
-        res.status(status).json({ status, errors: errorMessages });
-        return;
+        return handleUserErrors(errorMessages, 400, res);
     }
 
     const { username, password } = matchedData(req);
@@ -46,7 +43,7 @@ async function signup(req, res) {
         const hashedPassword = await bcrypt.hash(password, saltRounds);
         await createUser(username, hashedPassword);
 
-        status = 201;
+        const status = 201;
         res.status(status).json({ status, successMessage: 'You have successfully signed up! Please login to your account.' });
     } catch (error) {
         handleServerError(error, 'Something went wrong while signing you up. Please try again later.', res);
@@ -54,36 +51,27 @@ async function signup(req, res) {
 }
 
 async function login(req, res) {
-    let status;
-    let errors = {};
     const username = req.body.username.trim();
     const password = req.body.password.trim();
+    let errors = {};
 
     if (!username || !password) {
-        status = 400;
-
         if (!username) errors.username = 'Username is missing';
         if (!password) errors.password = 'Password is missing';
-
-        res.status(status).json({ status, errors });
-        return;
+        return handleUserErrors(errors, 400, res);
     }
 
     try {
         const user = await findUserByUsername(username);
         if (!user) {
-            status = 404;
             errors.username = 'User not found';
-            res.status(status).json({ status, errors });
-            return;
+            return handleUserErrors(errors, 404, res);
         }
 
         const passwordIsCorrect = await bcrypt.compare(password, user.password);
         if (!passwordIsCorrect) {
-            status = 401;
             errors.password = 'Incorrect password';
-            res.status(status).json({ status, errors });
-            return;
+            return handleUserErrors(errors, 401, res);
         }
 
         const userId = user.id;
@@ -101,7 +89,7 @@ async function login(req, res) {
         };
         res.cookie('refreshToken', refreshToken, refreshOptions);
 
-        status = 200;
+        const status = 200;
         res.status(status).json({ status, successMessage: `Welcome, ${username}! You are logged in.` });
     } catch (error) {
         handleServerError(error, 'Something went wrong while logging you in. Please try again later.', res);
