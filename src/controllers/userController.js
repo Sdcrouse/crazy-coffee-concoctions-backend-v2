@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 
 import { matchedData, validationResult } from 'express-validator';
 import { findUserByUsername, createUser, increaseTokenVersion } from '../databases/users.js';
-import { handleServerError, handleUserError, handleUserErrors } from '../utils/errorStatuses.js';
+import { handleServerError, handleUserError, handleUserErrors } from '../utils/errorHandlers.js';
 
 const defaultTokenOptions = {
     httpOnly: true,
@@ -30,12 +30,9 @@ async function signup(req, res) {
     }
 
     const { username, password } = matchedData(req);
+    
     const user = await findUserByUsername(username);
-
-    if (user) {
-        handleUserError('A user with this username already exists!', 409, res);
-        return;
-    }
+    if (user) return handleUserError('A user with this username already exists!', 409, res);
 
     const saltRounds = parseInt(process.env.SALT_ROUNDS);
     

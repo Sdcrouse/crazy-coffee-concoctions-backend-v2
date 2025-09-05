@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { handleServerError, handleUserError } from '../utils/errorStatuses.js';
+import { handleServerError, handleUserError } from '../utils/errorHandlers.js';
 
 async function verifySession(req, res, next) {
     let status;
@@ -27,17 +27,11 @@ async function verifySession(req, res, next) {
 
 async function verifyRefreshToken(req, res, next) {
     const refreshToken = req.cookies.refreshToken;
-    if (!refreshToken) {
-        handleUserError('No refresh token provided. Please log in.', 400, res);
-        return;
-    }
+    if (!refreshToken) return handleUserError('No refresh token provided. Please log in.', 400, res);
 
     try {
         jwt.verify(refreshToken, process.env.REFRESH_SECRET, async (err, decoded) => {
-            if (err) {
-                handleUserError('Either this refresh token has expired, or an invalid token was provided. Please log in.', 401, res);
-                return;
-            }
+            if (err) return handleUserError('Either this refresh token has expired, or an invalid token was provided. Please log in.', 401, res);
 
             req.userId = decoded.id;
             req.version = decoded.version;

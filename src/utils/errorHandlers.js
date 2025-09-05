@@ -5,7 +5,7 @@ function handleServerError(error, errorMessage, response) {
 }
 
 function handleUserError(errorMessage, status, response) {
-    response.status(status).json({ status, errorMessage });
+    return response.status(status).json({ status, errorMessage });
 }
 
 function handleUserErrors(errors, status, response, errorMessage = '') {

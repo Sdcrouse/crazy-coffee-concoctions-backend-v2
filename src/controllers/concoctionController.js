@@ -1,7 +1,7 @@
 import { findCoffeeByConcoctionId, createCoffee } from "../databases/coffees.js";
 import { findIngredientsByConcoctionId, createIngredient } from "../databases/ingredients.js";
 import { findConcoctionsByUserId, findConcoctionById, createConcoction } from "../databases/concoctions.js";
-import { handleServerError, handleUserError, handleUserErrors } from "../utils/errorStatuses.js";
+import { handleServerError, handleUserError, handleUserErrors } from "../utils/errorHandlers.js";
 
 async function getConcoctions(req, res) {
     const status = 200;
@@ -24,15 +24,9 @@ async function getConcoction(req, res) {
 
     try {
         const userConcoction = await findConcoctionById(id);
-        if (!userConcoction) {
-            handleUserError('This concoction does not exist.', 404, res);
-            return;
-        }
 
-        if (userConcoction.userId != req.userId) {
-            handleUserError('You are not allowed to access this concoction!', 403, res);
-            return;
-        }
+        if (!userConcoction) return handleUserError('This concoction does not exist.', 404, res);
+        if (userConcoction.userId != req.userId) return handleUserError('You are not allowed to access this concoction!', 403, res);
 
         const { instructions, notes } = userConcoction;
         
@@ -72,8 +66,7 @@ async function createNewConcoction(req, res) {
 
         for (const userConcoction of userConcoctions) {
             if (userConcoction.name === name) {
-                handleUserError('You already have a concoction with this name. Please enter a different name.', 409, res);
-                return;
+                return handleUserError('You already have a concoction with this name. Please enter a different name.', 409, res);
             }
         }
 
