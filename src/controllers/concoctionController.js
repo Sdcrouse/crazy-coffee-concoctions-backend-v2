@@ -1,6 +1,6 @@
 import { findCoffeeByConcoctionId, createCoffee } from "../databases/coffees.js";
 import { findIngredientsByConcoctionId, createIngredient } from "../databases/ingredients.js";
-import { findConcoctionsByUserId, findConcoctionById, createConcoction } from "../databases/concoctions.js";
+import { findConcoctionsByUserId, findConcoctionById, createConcoction, deleteConcoction } from "../databases/concoctions.js";
 import { handleServerError, handleUserError, handleUserErrors } from "../utils/errorHandlers.js";
 
 async function getConcoctions(req, res) {
@@ -90,8 +90,26 @@ async function createNewConcoction(req, res) {
     }
 }
 
+async function deleteUserConcoction(req, res) {
+    const concoctionId = req.params.id;
+
+    try {
+        const userConcoction = await findConcoctionById(concoctionId);
+
+        if (!userConcoction) return handleUserError('This concoction does not exist.', 404, res);
+        if (userConcoction.userId != req.userId) return handleUserError('You are not allowed to delete this concoction!', 403, res);
+
+        await deleteConcoction(concoctionId);
+
+        const status = 204;
+        res.status(status).json({ status });
+    } catch (error) {
+        handleServerError(error, "There was an error while deleting this concoction. Please try again later.", res);
+    }
+}
+
 function isBlank(value) {
     return value === undefined || value === null || value.trim().length === 0;
 }
 
-export { getConcoctions, getConcoction, createNewConcoction };
+export { getConcoctions, getConcoction, createNewConcoction, deleteUserConcoction };

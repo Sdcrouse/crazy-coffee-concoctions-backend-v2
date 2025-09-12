@@ -30,4 +30,8 @@ async function createConcoction(userId, name, instructions, notes) {
     return await pool.query('SELECT LAST_INSERT_ID()');
 }
 
-export { findConcoctionsByUserId, findConcoctionById, createConcoction };
+async function deleteConcoction(id) {
+    await pool.query('DELETE FROM concoctions WHERE id = ?', [id]);
+}
+
+export { findConcoctionsByUserId, findConcoctionById, createConcoction, deleteConcoction };

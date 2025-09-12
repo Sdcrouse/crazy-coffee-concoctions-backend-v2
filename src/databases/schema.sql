@@ -33,7 +33,7 @@ CREATE TABLE coffees (
     bean_type VARCHAR(30),
     blend VARCHAR(75) NOT NULL,
     roast VARCHAR(15),
-    FOREIGN KEY (concoction_id) REFERENCES concoctions(id)
+    FOREIGN KEY (concoction_id) REFERENCES concoctions(id) ON DELETE CASCADE
 );
 
 CREATE TABLE ingredients (
@@ -42,5 +42,5 @@ CREATE TABLE ingredients (
     amount VARCHAR(50) NOT NULL,
     `name` VARCHAR(50) NOT NULL,
     category VARCHAR(30) NOT NULL,
-    FOREIGN KEY (concoction_id) REFERENCES concoctions(id)
+    FOREIGN KEY (concoction_id) REFERENCES concoctions(id) ON DELETE CASCADE
 );
