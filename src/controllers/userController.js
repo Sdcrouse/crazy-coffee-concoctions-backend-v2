@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 import { matchedData, validationResult } from 'express-validator';
-import { findUserByUsername, createUser, increaseTokenVersion } from '../databases/users.js';
+import { findUserByUsername, findUserById, createUser, deleteUser, increaseTokenVersion } from '../databases/users.js';
 import { handleServerError, handleUserError, handleUserErrors } from '../utils/errorHandlers.js';
 import statusResponse from '../utils/statusResponse.js';
 
@@ -123,6 +123,20 @@ async function logout(req, res) {
     }
 }
 
+async function deleteProfile(req, res) {
+    try {
+        const user = await findUserById(req.userId);
+        if (!user) return handleUserError('User not found', 404, res); // Edge case
+
+        await deleteUser(req.userId);
+
+        const status = 204;
+        res.status(status).json({ status });
+    } catch (error) {
+        handleServerError(error, 'Something went wrong while deleting your user profile. Please try again later.', res);
+    }
+}
+
 function createAccessTokenAndOptions(id) {
     const accessToken = jwt.sign(
         { id },
@@ -138,4 +152,4 @@ function createAccessTokenAndOptions(id) {
     return { accessToken, accessOptions };
 }
 
-export { signup, login, refresh, logout };
+export { signup, login, refresh, logout, deleteProfile };

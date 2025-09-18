@@ -1,4 +1,4 @@
--- Note: For security purposes, there are no seeds for the users table.
+-- Note: For security purposes, there are no seeds for the users table. You will need to create five users before seeding this database.
 
 -- Concoctions:
 
