@@ -1,0 +1,17 @@
+PORT=5000
+SALT_ROUNDS=5
+MYSQL_HOST='127.0.0.1'
+MYSQL_USER='exampleUser'
+MYSQL_PASSWORD='password'
+MYSQL_DB='crazy_coffee_concoctions'
+JWT_SECRET='randomJwtSecret'
+REFRESH_SECRET='randomRefreshSecret'
+
+
+Notes:
+
+1. 5000 is the default PORT used by this application; it can be changed if need be.
+2. A higher number is recommended for the SALT_ROUNDS value.
+3. You may need a different MYSQL_HOST value depending on your operating system. For Windows operating systems, e.g., use '172.18.160.1'.
+4. Do NOT change the MYSQL_DB value! This is the name of the database that the src/databases/schema.sql file uses.
+5. It is HIGHLY recommended that you update the other fields with your own (ideally more secure) values. Be sure to leave the '' quotes around them.
